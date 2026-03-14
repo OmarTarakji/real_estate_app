@@ -1,13 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:real_estate_app/src/utils/extensions.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:real_estate_app/src/features/properties/presentation/widgets/property_price.dart';
+import 'package:real_estate_app/src/utils/random.dart';
 import 'package:real_estate_app/src/widgets/info_tile.dart';
 import 'package:real_estate_app/src/widgets/tag.dart';
 import 'package:real_estate_app/src/features/properties/presentation/widgets/property_feature.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import '../../domain/property.dart';
+import '../../domain/property_model.dart';
 import '../widgets/decorated_section.dart';
 
 class PropertyDetailsScreen extends ConsumerWidget {
@@ -27,17 +28,21 @@ class PropertyDetailsScreen extends ConsumerWidget {
             child: Column(
               spacing: 16,
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
                 SizedBox(
                   height: 300,
                   child: CarouselView.weighted(
-                    flexWeights: const [8, 1],
+                    itemSnapping: true,
+                    flexWeights: const [12, 1],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: .all(.circular(10)),
+                    ),
                     children: List.generate(
                       5,
                       (index) => CachedNetworkImage(
                         // height: 300,
-                        imageUrl: property.primaryImage,
+                        // imageUrl: property.primaryImage,
+                        imageUrl: getRandomImage(),
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
                           color: Colors.grey[300],
@@ -48,8 +53,8 @@ class PropertyDetailsScreen extends ConsumerWidget {
                         errorWidget: (context, url, error) => Container(
                           color: Colors.grey[300],
                           child: Icon(
-                            Icons.broken_image,
-                            size: 48,
+                            LucideIcons.imageOff,
+                            size: 64,
                             color: theme.colorScheme.primary,
                           ),
                         ),
@@ -60,26 +65,23 @@ class PropertyDetailsScreen extends ConsumerWidget {
                 ),
                 Text(
                   property.title,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Row(
                   children: [
                     InfoTile(
-                      icon: Icons.calendar_today_outlined,
+                      icon: LucideIcons.calendar,
                       text: 'أضيف بتاريخ ${property.createdAt.split(' ')[0]}',
                     ),
                     const SizedBox(width: 16.0),
-                    InfoTile(
-                      icon: Icons.remove_red_eye_outlined,
-                      text: property.views,
-                    ),
+                    InfoTile(icon: LucideIcons.eye, text: property.views),
                   ],
                 ),
                 Row(
                   children: [
-                    Tag(text: property.propertyType),
+                    Tag(text: property.typeName),
                     const SizedBox(width: 8),
                     Tag(
                       text: property.transactionType,
@@ -88,31 +90,16 @@ class PropertyDetailsScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: property.price,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: '   دولار أميركي (شهرياً)',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.outline,
-                        ),
-                      ),
-                    ],
-                  ),
+                PropertyPrice(
+                  price: property.price,
+                  type: property.transactionType,
                 ),
                 SizedBox(
                   width: double.infinity,
                   height: 40,
                   child: FilledButton.icon(
                     onPressed: () {},
-                    icon: const Icon(Icons.attach_money_rounded),
+                    icon: const Icon(LucideIcons.dollarSign),
                     label: const Text('تقديم عرض'),
                   ),
                 ),
@@ -124,13 +111,16 @@ class PropertyDetailsScreen extends ConsumerWidget {
                         Expanded(child: Text(property.address)),
                         Spacer(),
                         TextButton.icon(
-                          icon: Icon(Icons.map_rounded),
+                          icon: Icon(LucideIcons.map),
                           label: Text('عرض على الخريطة'),
-                          onPressed: () => openMap(
-                            context,
-                            property.latitude,
-                            property.longitude,
-                          ),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('ميزة الخريطة قيد التطوير'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -143,22 +133,22 @@ class PropertyDetailsScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         PropertyFeature(
-                          icon: Icons.bed_outlined,
+                          icon: LucideIcons.bed,
                           label: 'غرف نوم',
                           value: property.bedrooms.toString(),
                         ),
                         PropertyFeature(
-                          icon: Icons.bathtub_outlined,
+                          icon: LucideIcons.bath,
                           label: 'حمامات',
                           value: property.bathrooms.toString(),
                         ),
                         PropertyFeature(
-                          icon: Icons.crop_free_rounded,
+                          icon: LucideIcons.maximize2,
                           label: 'المساحة',
                           value: property.area,
                         ),
                         PropertyFeature(
-                          icon: Icons.people_outline,
+                          icon: LucideIcons.users,
                           label: 'عدد النزلاء',
                           value: property.residents,
                         ),
@@ -215,26 +205,5 @@ class PropertyDetailsScreen extends ConsumerWidget {
     if (namesLength > 1) return parts[0][0] + parts[1][0];
 
     return parts[0][0];
-  }
-
-  void openMap(BuildContext context, double latitude, double longitude) async {
-    final String googleMapsUrl =
-        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-
-    Uri uri = Uri.parse(googleMapsUrl);
-
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      if (context.mounted) context.showErrorSnackBar('Could not launch $uri');
-      //
-      // final String webMapUrl = 'https://www.google.com/maps/@?api=1&map_action=map&center=$latitude,$longitude';
-      // Uri webUri = Uri.parse(webMapUrl);
-      // if (await canLaunchUrl(webUri)) {
-      //   await launchUrl(webUri);
-      // } else {
-      //   throw 'Could not launch any map URI';
-      // }
-    }
   }
 }

@@ -1,6 +1,5 @@
-import 'package:real_estate_app/src/api/api_service.dart';
-
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:real_estate_app/src/shared/data/network/api_end_point.dart';
 
 part 'property_details.freezed.dart';
 part 'property_details.g.dart';
@@ -25,8 +24,7 @@ abstract class PropertyDetails with _$PropertyDetails {
   factory PropertyDetails.fromJson(Map<String, dynamic> json) =>
       _$PropertyDetailsFromJson(json);
 
-  String get resolvedImageUrl =>
-      imageUrl.replaceFirst('localhost', ApiService.ipAddress);
+  String get resolvedImageUrl => imageUrl.replaceFirst('localhost', ipAddress);
 }
 
 @freezed

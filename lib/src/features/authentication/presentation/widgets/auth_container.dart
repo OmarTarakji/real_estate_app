@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:real_estate_app/src/theme/app_colors.dart';
 
 class AuthContainer extends StatelessWidget {
-  final List<Widget> children;
   const AuthContainer({required this.children, super.key});
+
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -29,8 +32,8 @@ class AuthContainer extends StatelessWidget {
                     const SizedBox(height: 24),
                     Text(
                       'دلّال',
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
+                      style: theme.textTheme.displayLarge?.copyWith(
+                        color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

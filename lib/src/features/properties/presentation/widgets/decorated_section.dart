@@ -14,13 +14,16 @@ class DecoratedSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 16.0),
-          ...children,
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 10.0),
+            ...children,
+          ],
+        ),
       ),
     );
   }

@@ -1,0 +1,250 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Real Estate API",
+    "description": "Backend API for a real estate application, built with CodeIgniter 4.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/public/all_properties": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Get all properties (paginated)",
+        "description": "Retrieves a paginated list of all properties.",
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 }, "description": "Page number." },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 }, "description": "Number of items per page." }
+        ],
+        "responses": {
+          "200": { "description": "A paginated list of properties.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PropertyListResponse" } } } }
+        }
+      }
+    },
+    "/public/properties/{id}": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Get a single property by ID",
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": {
+          "200": { "description": "Property details.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Property" } } } },
+          "404": { "description": "Property not found." }
+        }
+      }
+    },
+    "/public/search": {
+      "post": {
+        "tags": ["Public"],
+        "summary": "Search for properties",
+        "requestBody": {
+          "content": { "application/json": { "schema": {
+            "type": "object",
+            "properties": {
+              "city": { "type": "string" }, "property_type_id": { "type": "integer" }, "min_price": { "type": "number" }, "max_price": { "type": "number" },
+              "transaction_type": { "type": "string", "enum": ["sale", "rent"] }, "min_area": { "type": "number" }, "max_area": { "type": "number" }
+            }
+          } } }
+        },
+        "responses": { "200": { "description": "Search results." } }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": {
+            "type": "object", "required": ["username", "email", "password", "password_confirm"],
+            "properties": { "username": { "type": "string" }, "email": { "type": "string", "format": "email" }, "password": { "type": "string", "format": "password" }, "password_confirm": { "type": "string", "format": "password" }, "phone": { "type": "string" } }
+          } } }
+        },
+        "responses": {
+          "201": { "description": "User registered successfully.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthResponse" } } } },
+          "422": { "description": "Validation error." }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Log in a user",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": {
+            "type": "object", "required": ["email", "password"],
+            "properties": { "email": { "type": "string", "format": "email" }, "password": { "type": "string", "format": "password" } }
+          } } }
+        },
+        "responses": {
+          "200": { "description": "Login successful.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthResponse" } } } },
+          "401": { "description": "Invalid credentials." }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user details",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User details.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/properties": {
+      "get": {
+        "tags": ["Properties"], "summary": "Get list of properties (paginated)", "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": { "200": { "description": "List of properties." } }
+      },
+      "post": {
+        "tags": ["Properties"], "summary": "Create a new property", "security": [{ "bearerAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PropertyInput" } } } },
+        "responses": { "201": { "description": "Property created." }, "422": { "description": "Validation error." } }
+      }
+    },
+    "/properties/{id}": {
+      "get": {
+        "tags": ["Properties"], "summary": "Get property by ID", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": { "200": { "description": "Property details." }, "404": { "description": "Not Found." } }
+      },
+      "put": {
+        "tags": ["Properties"], "summary": "Update a property", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PropertyInput" } } } },
+        "responses": { "200": { "description": "Property updated." }, "403": { "description": "Forbidden." }, "404": { "description": "Not Found." } }
+      },
+      "delete": {
+        "tags": ["Properties"], "summary": "Delete a property", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": { "200": { "description": "Property deleted." }, "403": { "description": "Forbidden." }, "404": { "description": "Not Found." } }
+      }
+    },
+    "/properties/{id}/favorite": {
+      "post": {
+        "tags": ["Properties"], "summary": "Toggle favorite status for a property", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": { "200": { "description": "Favorite status updated." } }
+      }
+    },
+    "/properties/{id}/images": {
+      "get": {
+        "tags": ["Properties"], "summary": "Get images for a property", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": { "200": { "description": "List of image URLs." } }
+      },
+      "post": {
+        "tags": ["Properties"], "summary": "Upload an image for a property", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "requestBody": { "content": { "multipart/form-data": { "schema": { "type": "object", "properties": { "image": { "type": "string", "format": "binary" } } } } } },
+        "responses": { "201": { "description": "Image uploaded." } }
+      }
+    },
+    "/properties/images/{imageId}": {
+      "delete": {
+        "tags": ["Properties"], "summary": "Delete a property image", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "imageId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": { "200": { "description": "Image deleted." } }
+      }
+    },
+    "/offers": {
+      "get": { "tags": ["Offers"], "summary": "Get all offers (for admin)", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "A list of offers." } } },
+      "post": {
+        "tags": ["Offers"], "summary": "Create a new offer", "security": [{ "bearerAuth": [] }],
+        "requestBody": { "content": { "application/json": { "schema": {
+          "type": "object", "required": ["property_id", "offer_price"], "properties": { "property_id": { "type": "integer" }, "offer_price": { "type": "number" } }
+        } } } },
+        "responses": { "201": { "description": "Offer created." } }
+      }
+    },
+    "/offers/{id}": {
+      "get": {
+        "tags": ["Offers"], "summary": "Get an offer by ID", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": { "200": { "description": "Offer details." } }
+      },
+      "delete": {
+        "tags": ["Offers"], "summary": "Delete an offer", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": { "200": { "description": "Offer deleted." } }
+      }
+    },
+    "/offers/{id}/status": {
+      "put": {
+        "tags": ["Offers"], "summary": "Update offer status", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] } } } } } },
+        "responses": { "200": { "description": "Offer status updated." } }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "tags": ["Users"], "summary": "Get current user profile", "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "User profile data." }, "401": { "description": "Unauthorized." } }
+      },
+      "put": {
+        "tags": ["Users"], "summary": "Update user profile", "security": [{ "bearerAuth": [] }],
+        "requestBody": { "content": { "application/json": { "schema": {
+          "type": "object", "properties": { "username": { "type": "string" }, "phone": { "type": "string" } }
+        } } } },
+        "responses": { "200": { "description": "Profile updated." }, "401": { "description": "Unauthorized." } }
+      }
+    },
+    "/users/favorites": { "get": { "tags": ["Users"], "summary": "Get user's favorite properties", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "List of favorite properties." } } } },
+    "/users/notifications": { "get": { "tags": ["Users"], "summary": "Get user's notifications", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "List of notifications." } } } },
+    "/users/notifications/mark-read": { "put": { "tags": ["Users"], "summary": "Mark all user notifications as read", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "Notifications marked as read." } } } },
+    "/admin/stats": { "get": { "tags": ["Admin"], "summary": "Get application statistics", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "Admin statistics." } } } },
+    "/admin/users": { "get": { "tags": ["Admin"], "summary": "Get all users", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "List of all users." } } } },
+    "/admin/properties": { "get": { "tags": ["Admin"], "summary": "Get all properties (for admin)", "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "List of all properties." } } } },
+    "/admin/users/{id}/status": {
+      "put": {
+        "tags": ["Admin"], "summary": "Update a user's status", "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "is_active": { "type": "boolean" } } } } } },
+        "responses": { "200": { "description": "User status updated." } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": { "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } },
+    "schemas": {
+      "User": { "type": "object", "properties": { "id": { "type": "integer" }, "username": { "type": "string" }, "email": { "type": "string", "format": "email" }, "phone": { "type": "string" }, "is_active": { "type": "boolean" }, "last_login": { "type": "string", "format": "date-time" }, "role": { "type": "string" } } },
+      "Property": { "type": "object", "properties": {
+        "id": { "type": "integer" }, "title": { "type": "string" }, "description": { "type": "string" }, "price": { "type": "number" }, "area": { "type": "number" }, "bedrooms": { "type": "integer" }, "bathrooms": { "type": "integer" },
+        "transaction_type": { "type": "string", "enum": ["sale", "rent"] }, "status": { "type": "string" }, "views": { "type": "integer" }, "owner_name": { "type": "string" }, "property_type": { "type": "string" },
+        "street_address": { "type": "string" }, "city": { "type": "string" }, "images": { "type": "array", "items": { "type": "string", "format": "uri" } }, "is_favorited": { "type": "boolean" }
+      } },
+      "PropertyInput": {
+        "type": "object", "required": ["title", "description", "price", "area", "property_type_id", "transaction_type", "address"],
+        "properties": {
+          "title": { "type": "string" }, "description": { "type": "string" }, "price": { "type": "number" }, "area": { "type": "number" }, "property_type_id": { "type": "integer" }, "transaction_type": { "type": "string", "enum": ["sale", "rent"] },
+          "bedrooms": { "type": "integer" }, "bathrooms": { "type": "integer" },
+          "address": {
+            "type": "object", "required": ["street_address", "city", "country"],
+            "properties": { "street_address": { "type": "string" }, "city": { "type": "string" }, "state": { "type": "string" }, "country": { "type": "string" }, "postal_code": { "type": "string" }, "latitude": { "type": "number" }, "longitude": { "type": "number" } }
+          }
+        }
+      },
+      "Offer": { "type": "object", "properties": { "id": { "type": "integer" }, "property_id": { "type": "integer" }, "user_id": { "type": "integer" }, "offer_price": { "type": "number" }, "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] }, "created_at": { "type": "string", "format": "date-time" } } },
+      "AuthResponse": { "type": "object", "properties": {
+        "success": { "type": "boolean" }, "message": { "type": "string" },
+        "data": { "type": "object", "properties": { "user": { "$ref": "#/components/schemas/User" }, "token": { "type": "string" }, "token_type": { "type": "string", "example": "Bearer" }, "expires_in": { "type": "integer", "example": 86400 } } }
+      } },
+      "PropertyListResponse": { "type": "object", "properties": {
+        "data": { "type": "array", "items": { "$ref": "#/components/schemas/Property" } },
+        "pagination": { "type": "object", "properties": { "total": { "type": "integer" }, "per_page": { "type": "integer" }, "current_page": { "type": "integer" }, "last_page": { "type": "integer" } } }
+      } }
+    }
+  }
+}

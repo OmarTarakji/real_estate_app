@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:real_estate_app/src/utils/extensions.dart';
-import 'package:real_estate_app/src/features/authentication/application/auth_provider.dart';
-import 'package:real_estate_app/src/features/authentication/presentation/widgets/auth_container.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'package:real_estate_app/src/utils/extensions.dart';
+import 'package:real_estate_app/src/features/authentication/application/auth_service.dart';
+import 'package:real_estate_app/src/features/authentication/presentation/widgets/auth_container.dart';
 import '../widgets/loading_overlay.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -28,16 +29,80 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          _buildBody(context, ref),
+          _Body(
+            usernameController: _usernameController,
+            phoneController: _phoneController,
+            emailController: _emailController,
+            passwordController: _passwordController,
+            password2Controller: _password2Controller,
+            obscure: _obscure,
+            obscure2: _obscure2,
+            onToggleObscure: () => setState(() => _obscure = !_obscure),
+            onToggleObscure2: () => setState(() => _obscure2 = !_obscure2),
+            onSignup: () => _handleSignup(),
+          ),
           if (isLoading) const LoadingOverlay(),
         ],
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context, WidgetRef ref) {
+  void _handleSignup() async {
+    setState(() => isLoading = true);
+
+    try {
+      final notifier = ref.read(authServiceProvider.notifier);
+      await notifier.signup(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        passwordConfirm: _password2Controller.text,
+        username: _usernameController.text.trim(),
+        phone: _phoneController.text.trim(),
+      );
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        context.showErrorSnackBar('فشل إنشاء الحساب: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
+  }
+}
+
+class _Body extends StatelessWidget {
+  const _Body({
+    required this.usernameController,
+    required this.phoneController,
+    required this.emailController,
+    required this.passwordController,
+    required this.password2Controller,
+    required this.obscure,
+    required this.obscure2,
+    required this.onToggleObscure,
+    required this.onToggleObscure2,
+    required this.onSignup,
+  });
+
+  final TextEditingController usernameController;
+  final TextEditingController phoneController;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final TextEditingController password2Controller;
+  final bool obscure;
+  final bool obscure2;
+  final VoidCallback onToggleObscure;
+  final VoidCallback onToggleObscure2;
+  final VoidCallback onSignup;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final notifier = ref.watch(authProvider.notifier);
 
     return AuthContainer(
       children: [
@@ -54,11 +119,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         ),
         const SizedBox(height: 32),
         TextField(
-          controller: _usernameController,
+          controller: usernameController,
           keyboardType: TextInputType.name,
           decoration: const InputDecoration(
             labelText: 'اسم المستخدم',
-            prefixIcon: Icon(Icons.person_outline),
+            prefixIcon: Icon(LucideIcons.user),
           ),
         ),
         const SizedBox(height: 16),
@@ -68,49 +133,45 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
-                controller: _phoneController,
+                controller: phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(
                   labelText: 'رقم الهاتف',
-                  prefixIcon: Icon(Icons.phone_outlined),
+                  prefixIcon: Icon(LucideIcons.phone),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: _emailController,
+                controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   labelText: 'عنوان البريد الإلكتروني',
-                  prefixIcon: Icon(Icons.email_outlined),
+                  prefixIcon: Icon(LucideIcons.mail),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: _passwordController,
-                obscureText: _obscure,
+                controller: passwordController,
+                obscureText: obscure,
                 decoration: InputDecoration(
                   labelText: 'كلمة المرور',
-                  prefixIcon: const Icon(Icons.lock_outline),
+                  prefixIcon: const Icon(LucideIcons.lock),
                   suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscure ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () => setState(() => _obscure = !_obscure),
+                    icon: Icon(obscure ? LucideIcons.eye : LucideIcons.eyeOff),
+                    onPressed: onToggleObscure,
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: _password2Controller,
-                obscureText: _obscure2,
+                controller: password2Controller,
+                obscureText: obscure2,
                 decoration: InputDecoration(
                   labelText: 'تأكيد كلمة المرور',
-                  prefixIcon: const Icon(Icons.lock_outline),
+                  prefixIcon: const Icon(LucideIcons.lock),
                   suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscure2 ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () => setState(() => _obscure2 = !_obscure2),
+                    icon: Icon(obscure2 ? LucideIcons.eye : LucideIcons.eyeOff),
+                    onPressed: onToggleObscure2,
                   ),
                 ),
               ),
@@ -124,27 +185,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
             ),
-            onPressed: () async {
-              setState(() => isLoading = true);
-              final error = await notifier.signup(
-                email: _emailController.text.trim(),
-                password: _passwordController.text,
-                passwordConfirm: _password2Controller.text,
-                username: _usernameController.text.trim(),
-                phone: _phoneController.text.trim(),
-              );
-              setState(() => isLoading = false);
-              if (mounted) {
-                if (error != null) {
-                  context.showErrorSnackBar(error);
-                } else {
-                  Navigator.of(context).pop();
-                }
-              }
-            },
+            onPressed: onSignup,
             child: const Text('إنشاء حساب'),
           ),
         ),

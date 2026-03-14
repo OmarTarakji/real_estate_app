@@ -1,32 +1,52 @@
 import 'package:flutter/material.dart';
 
-TextTheme createTextTheme(
-  BuildContext context,
-  String bodyFontFamily,
-  String displayFontFamily,
-) {
-  TextTheme baseTextTheme = Theme.of(context).textTheme;
-
-  // Create text themes using the custom font families
-  TextTheme bodyTextTheme = baseTextTheme.apply(
-    fontFamily: bodyFontFamily,
-    // fontSizeFactor: 1.2,
-  );
-
-  TextTheme displayTextTheme = baseTextTheme.apply(
-    fontFamily: displayFontFamily,
-    // fontSizeFactor: 1.2,
-  );
-
-  // Combine the text themes
-  TextTheme textTheme = displayTextTheme.copyWith(
-    bodyLarge: bodyTextTheme.bodyLarge,
-    bodyMedium: bodyTextTheme.bodyMedium,
-    bodySmall: bodyTextTheme.bodySmall,
-    labelLarge: bodyTextTheme.labelLarge,
-    labelMedium: bodyTextTheme.labelMedium,
-    labelSmall: bodyTextTheme.labelSmall,
-  );
-
-  return textTheme;
-}
+final textTheme = TextTheme(
+  labelMedium: TextStyle(
+    fontSize: 12,
+    fontWeight: .w500,
+    height: 1.4,
+    letterSpacing: 0.0,
+  ),
+  labelLarge: TextStyle(
+    fontSize: 14,
+    fontWeight: .w500,
+    height: 1.4,
+    letterSpacing: 0.0,
+  ),
+  bodyMedium: TextStyle(
+    fontSize: 14,
+    fontWeight: .w400,
+    height: 1.5,
+    letterSpacing: 0.0,
+  ),
+  bodyLarge: TextStyle(
+    fontSize: 16,
+    fontWeight: .w400,
+    height: 1.5,
+    letterSpacing: 0.0,
+  ),
+  titleMedium: TextStyle(
+    fontSize: 18,
+    fontWeight: .w500,
+    height: 1.3,
+    letterSpacing: -0.2,
+  ),
+  titleLarge: TextStyle(
+    fontSize: 20,
+    fontWeight: .w500,
+    height: 1.3,
+    letterSpacing: -0.2,
+  ),
+  displayMedium: TextStyle(
+    fontSize: 24,
+    fontWeight: .w600,
+    height: 1.2,
+    letterSpacing: -0.3,
+  ),
+  displayLarge: TextStyle(
+    fontSize: 28,
+    fontWeight: .w600,
+    height: 1.2,
+    letterSpacing: -0.4,
+  ),
+);

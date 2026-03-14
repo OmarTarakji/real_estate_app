@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:real_estate_app/src/features/profile/presentation/profile_screen.dart';
-import 'package:real_estate_app/src/features/properties/presentation/screens/favorites_screen.dart';
 import 'package:real_estate_app/src/features/properties/presentation/screens/home_screen.dart';
-
-import 'custom_navigation_bar.dart';
+import 'package:real_estate_app/src/features/search/presentation/screens/search_screen.dart';
 
 class MainNavigationShell extends StatefulWidget {
   const MainNavigationShell({super.key});
@@ -17,21 +17,38 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   @override
   Widget build(BuildContext context) {
-    const screens = [HomePage(), FavoritesScreen(), ProfileScreen()];
+    final colorScheme = Theme.of(context).colorScheme;
+    final screens = [HomePage(), const SearchScreen(), ProfileScreen()];
+
     return Scaffold(
       body: screens[_selectedIndex],
-      bottomNavigationBar: CustomNavigationBar(
-        destinations: _destination,
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) =>
-            setState(() => _selectedIndex = index),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: colorScheme.outlineVariant, width: 1),
+          ),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: GNav(
+          color: colorScheme.onSurface,
+          activeColor: colorScheme.primary,
+          tabBackgroundColor: colorScheme.primaryContainer.withAlpha(100),
+          rippleColor: colorScheme.primaryContainer.withAlpha(60),
+          hoverColor: colorScheme.primaryContainer.withAlpha(40),
+          tabBorderRadius: 16,
+          gap: 8,
+          iconSize: 24,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          duration: Duration(milliseconds: 400),
+          tabs: [
+            GButton(icon: LucideIcons.house, text: 'الرئيسية'),
+            GButton(icon: LucideIcons.search, text: 'بحث'),
+            GButton(icon: LucideIcons.user, text: 'الملف الشخصي'),
+          ],
+          selectedIndex: _selectedIndex,
+          onTabChange: (index) => setState(() => _selectedIndex = index),
+        ),
       ),
     );
   }
-
-  static const _destination = [
-    CustomDestination(icon: Icons.home_outlined, label: 'Home'),
-    CustomDestination(icon: Icons.favorite_outline_rounded, label: 'Favorites'),
-    CustomDestination(icon: Icons.person_outline_rounded, label: 'Profile'),
-  ];
 }
