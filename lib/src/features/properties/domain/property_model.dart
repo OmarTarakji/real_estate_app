@@ -1,4 +1,3 @@
-import 'dart:math' show Random;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:real_estate_app/src/utils/random.dart';
 

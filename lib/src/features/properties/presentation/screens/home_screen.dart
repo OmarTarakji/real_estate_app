@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../data/properties_repository.dart';
+import 'favorites_screen.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/property_card.dart';
@@ -72,12 +73,8 @@ class HomePage extends StatelessWidget {
             actions: [
               IconButton(
                 onPressed: () {
-                  // TODO: Navigate to favorites or show favorites
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('المفضلة'),
-                      duration: Duration(seconds: 2),
-                    ),
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const FavoritesScreen()),
                   );
                 },
                 icon: const Icon(LucideIcons.heart),

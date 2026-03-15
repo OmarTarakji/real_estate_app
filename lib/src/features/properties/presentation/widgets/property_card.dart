@@ -8,6 +8,7 @@ import 'package:real_estate_app/src/widgets/tag.dart';
 
 import '../../domain/property_model.dart';
 import '../screens/property_details_screen.dart';
+import 'favorite_toggle.dart';
 
 class PropertyCard extends StatelessWidget {
   const PropertyCard(this.property, {super.key});
@@ -29,6 +30,7 @@ class PropertyCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _PropertyImage(
+              propertyId: property.id,
               imageUrl: property.primaryImage,
               transactionType: property.transactionType,
               typeName: property.typeName,
@@ -68,12 +70,14 @@ class PropertyCard extends StatelessWidget {
 class _PropertyImage extends StatelessWidget {
   const _PropertyImage({
     required this.imageUrl,
+    required this.propertyId,
     required this.transactionType,
     required this.typeName,
     required this.theme,
   });
 
   final String imageUrl;
+  final String propertyId;
   final String transactionType;
   final String typeName;
   final ThemeData theme;
@@ -116,7 +120,7 @@ class _PropertyImage extends StatelessWidget {
                 foregroundColor: theme.colorScheme.secondary,
               ),
               const Spacer(),
-              // TODO: Add favorite button here
+              FavoriteToggle(id: propertyId),
             ],
           ),
         ),

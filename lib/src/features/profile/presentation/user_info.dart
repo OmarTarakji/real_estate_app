@@ -89,7 +89,7 @@ class UserInfo extends StatelessWidget {
 }
 
 class _UserAvatarSection extends StatelessWidget {
-  const _UserAvatarSection({super.key, required this.user});
+  const _UserAvatarSection({required this.user});
 
   final UserModel user;
 
@@ -248,7 +248,7 @@ class _UserAvatarSection extends StatelessWidget {
 }
 
 class _InfoCard extends StatelessWidget {
-  const _InfoCard({super.key, required this.title, required this.children});
+  const _InfoCard({required this.title, required this.children});
 
   final String title;
   final List<Widget> children;
@@ -280,7 +280,6 @@ class _InfoCard extends StatelessWidget {
 
 class _InfoItem extends StatelessWidget {
   const _InfoItem({
-    super.key,
     required this.icon,
     required this.label,
     required this.value,

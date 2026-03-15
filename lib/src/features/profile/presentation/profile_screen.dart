@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:real_estate_app/src/widgets/error_screen.dart';
 import 'package:real_estate_app/src/widgets/loading_body.dart';
-import 'package:real_estate_app/src/features/authentication/application/auth_service.dart';
 import 'package:real_estate_app/src/features/profile/data/user_repository.dart';
 import 'package:real_estate_app/src/features/profile/presentation/user_info.dart';
-import 'package:real_estate_app/src/features/profile/domain/user_model.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});

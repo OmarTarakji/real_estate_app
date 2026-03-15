@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:real_estate_app/src/features/profile/presentation/profile_screen.dart';
+import 'package:real_estate_app/src/features/listings/presentation/screens/add_listing_screen.dart';
+import 'package:real_estate_app/src/features/offers/presentation/screens/offers_screen.dart';
 import 'package:real_estate_app/src/features/properties/presentation/screens/home_screen.dart';
 import 'package:real_estate_app/src/features/search/presentation/screens/search_screen.dart';
 
@@ -18,7 +20,13 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final screens = [HomePage(), const SearchScreen(), ProfileScreen()];
+    final screens = [
+      HomePage(),
+      const SearchScreen(),
+      const AddListingScreen(),
+      const OffersScreen(),
+      ProfileScreen(),
+    ];
 
     return Scaffold(
       body: screens[_selectedIndex],
@@ -38,11 +46,13 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           tabBorderRadius: 16,
           gap: 8,
           iconSize: 24,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           duration: Duration(milliseconds: 400),
           tabs: [
             GButton(icon: LucideIcons.house, text: 'الرئيسية'),
             GButton(icon: LucideIcons.search, text: 'بحث'),
+            GButton(icon: LucideIcons.plus, text: 'إضافة'),
+            GButton(icon: LucideIcons.messageSquare, text: 'الرسائل'),
             GButton(icon: LucideIcons.user, text: 'الملف الشخصي'),
           ],
           selectedIndex: _selectedIndex,

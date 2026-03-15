@@ -94,7 +94,7 @@ final class PropertiesProvider
   }
 }
 
-String _$propertiesHash() => r'399f2f15368a48c80fa70f6301eed210d3aaf19f';
+String _$propertiesHash() => r'96fcdb86bf45f4348d71353db8ebae345b4b96b5';
 
 @ProviderFor(property)
 final propertyProvider = PropertyFamily._();
@@ -146,7 +146,7 @@ final class PropertyProvider
   }
 }
 
-String _$propertyHash() => r'e813ec18381f1c6ba3ffea91a0fa4e32a4618011';
+String _$propertyHash() => r'4797f41a22dd5a6a01c2c438e0a15f67e5220a4b';
 
 final class PropertyFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Property>, String> {
