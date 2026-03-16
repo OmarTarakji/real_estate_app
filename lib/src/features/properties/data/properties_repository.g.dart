@@ -94,7 +94,7 @@ final class PropertiesProvider
   }
 }
 
-String _$propertiesHash() => r'96fcdb86bf45f4348d71353db8ebae345b4b96b5';
+String _$propertiesHash() => r'5ca8be2dee281c05adc8a5e7b4e32343270da176';
 
 @ProviderFor(property)
 final propertyProvider = PropertyFamily._();

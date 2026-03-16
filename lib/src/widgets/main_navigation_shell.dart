@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:real_estate_app/src/features/profile/presentation/profile_screen.dart';
@@ -6,19 +7,16 @@ import 'package:real_estate_app/src/features/listings/presentation/screens/add_l
 import 'package:real_estate_app/src/features/offers/presentation/screens/offers_screen.dart';
 import 'package:real_estate_app/src/features/properties/presentation/screens/home_screen.dart';
 import 'package:real_estate_app/src/features/search/presentation/screens/search_screen.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class MainNavigationShell extends StatefulWidget {
+part 'main_navigation_shell.g.dart';
+
+class MainNavigationShell extends ConsumerWidget {
   const MainNavigationShell({super.key});
 
   @override
-  State<MainNavigationShell> createState() => _MainNavigationShellState();
-}
-
-class _MainNavigationShellState extends State<MainNavigationShell> {
-  int _selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedIndex = ref.watch(selectedPageIndexProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final screens = [
       HomePage(),
@@ -29,7 +27,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     ];
 
     return Scaffold(
-      body: screens[_selectedIndex],
+      body: screens[selectedIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           border: Border(
@@ -55,10 +53,19 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             GButton(icon: LucideIcons.messageSquare, text: 'الرسائل'),
             GButton(icon: LucideIcons.user, text: 'الملف الشخصي'),
           ],
-          selectedIndex: _selectedIndex,
-          onTabChange: (index) => setState(() => _selectedIndex = index),
+          selectedIndex: selectedIndex,
+          onTabChange: (index) =>
+              ref.read(selectedPageIndexProvider.notifier).setIndex(index),
         ),
       ),
     );
   }
+}
+
+@riverpod
+class SelectedPageIndexNotifier extends _$SelectedPageIndexNotifier {
+  @override
+  int build() => 0;
+
+  void setIndex(int index) => state = index;
 }

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import 'package:real_estate_app/src/features/properties/application/mock_properties_state.dart';
 import 'package:real_estate_app/src/features/properties/domain/property_model.dart';
 
 import 'package:real_estate_app/src/features/properties/domain/properties_response.dart';
@@ -42,7 +43,7 @@ PropertiesRepository propertiesRepository(Ref ref) {
 @riverpod
 Future<List<Property>> properties(Ref ref) {
   final properties = useMockData
-      ? Future.value(buildMockProperties())
+      ? Future.value(ref.watch(mockPropertiesProvider))
       : ref.watch(propertiesRepositoryProvider).getProperties();
   ref.keepAlive();
   return properties;

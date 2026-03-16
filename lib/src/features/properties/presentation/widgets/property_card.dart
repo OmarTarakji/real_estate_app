@@ -86,26 +86,43 @@ class _PropertyImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        CachedNetworkImage(
-          imageUrl: imageUrl,
-          height: 150,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => Container(
-            height: 200,
-            color: Colors.grey[300],
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-          errorWidget: (context, url, error) => Container(
-            height: 200,
-            color: Colors.grey[300],
-            child: Icon(
-              LucideIcons.imageOff,
-              size: 48,
-              color: theme.colorScheme.primary,
+        if (imageUrl.startsWith('assets/'))
+          Image.asset(
+            imageUrl,
+            height: 150,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              height: 200,
+              color: Colors.grey[300],
+              child: Icon(
+                LucideIcons.imageOff,
+                size: 48,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+          )
+        else
+          CachedNetworkImage(
+            imageUrl: imageUrl,
+            height: 150,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            placeholder: (context, url) => Container(
+              height: 200,
+              color: Colors.grey[300],
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+            errorWidget: (context, url, error) => Container(
+              height: 200,
+              color: Colors.grey[300],
+              child: Icon(
+                LucideIcons.imageOff,
+                size: 48,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
-        ),
         PositionedDirectional(
           top: 8,
           start: 8,

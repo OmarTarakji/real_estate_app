@@ -4,6 +4,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:real_estate_app/src/features/authentication/application/auth_service.dart';
+import 'package:real_estate_app/src/features/listings/presentation/screens/my_listings_screen.dart';
+import 'package:real_estate_app/src/features/notifications/presentation/screens/notifications_screen.dart';
 
 import 'package:real_estate_app/src/features/profile/domain/user_model.dart';
 import 'package:real_estate_app/src/widgets/decorated_container.dart';
@@ -16,6 +18,7 @@ class UserInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting('ar');
+    final theme = Theme.of(context);
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -67,6 +70,54 @@ class UserInfo extends StatelessWidget {
                       value: _formatDate(user.dateJoined),
                     ),
                   ],
+                ),
+                DecoratedContainer(
+                  child: ListTile(
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        LucideIcons.building,
+                        color: theme.colorScheme.primary,
+                        size: 20,
+                      ),
+                    ),
+                    title: const Text('إعلاناتي'),
+                    trailing: const Icon(LucideIcons.chevronLeft),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const MyListingsScreen(),
+                      ),
+                    ),
+                  ),
+                ),
+                DecoratedContainer(
+                  child: ListTile(
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        LucideIcons.bell,
+                        color: theme.colorScheme.primary,
+                        size: 20,
+                      ),
+                    ),
+                    title: const Text('الإشعارات'),
+                    trailing: const Icon(LucideIcons.chevronLeft),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationsScreen(),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

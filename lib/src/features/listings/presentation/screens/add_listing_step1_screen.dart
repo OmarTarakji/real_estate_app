@@ -230,7 +230,7 @@ class _AddListingStep1ScreenState extends State<AddListingStep1Screen> {
     );
   }
 
-  void _onNext() {
+  Future<void> _onNext() async {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
 
@@ -247,9 +247,28 @@ class _AddListingStep1ScreenState extends State<AddListingStep1Screen> {
       listingType: _listingType,
     );
 
-    Navigator.of(context).push(
+    final created = await Navigator.of(context).push<bool>(
       MaterialPageRoute(builder: (_) => AddListingStep2Screen(draft: draft)),
     );
+
+    if (!mounted) return;
+    if (created == true) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تمت إضافة العقار بنجاح')));
+      _formKey.currentState?.reset();
+      _titleController.clear();
+      _descriptionController.clear();
+      _locationController.clear();
+      _areaController.clear();
+      _bedroomsController.clear();
+      _bathroomsController.clear();
+      _residentsController.clear();
+      setState(() {
+        _propertyType = null;
+        _listingType = 'بيع';
+      });
+    }
   }
 
   String? _requiredText(String? value, String message) {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:real_estate_app/src/features/notifications/application/notifications_state.dart';
+import 'package:real_estate_app/src/features/notifications/presentation/screens/notifications_screen.dart';
 
 import '../../data/properties_repository.dart';
 import 'favorites_screen.dart';
@@ -71,6 +73,58 @@ class HomePage extends StatelessWidget {
               ),
             ),
             actions: [
+              Consumer(
+                builder: (context, ref, _) {
+                  final unreadCount = ref.watch(
+                    unreadNotificationsCountProvider,
+                  );
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const NotificationsScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(LucideIcons.bell),
+                        tooltip: 'الإشعارات',
+                      ),
+                      if (unreadCount > 0)
+                        PositionedDirectional(
+                          top: 6,
+                          end: 6,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.error,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.surface,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Text(
+                              unreadCount.toString(),
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onError,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
               IconButton(
                 onPressed: () {
                   Navigator.of(context).push(

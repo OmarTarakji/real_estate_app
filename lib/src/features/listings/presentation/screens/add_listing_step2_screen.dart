@@ -2,22 +2,28 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:real_estate_app/src/features/listings/presentation/widgets/form_section.dart';
+import 'package:real_estate_app/src/features/properties/application/mock_properties_state.dart';
+import 'package:real_estate_app/src/features/properties/domain/property_model.dart';
+import 'package:real_estate_app/src/features/properties/presentation/screens/property_details_screen.dart';
+import 'package:real_estate_app/src/widgets/main_navigation_shell.dart';
 
 import '../models/add_listing_draft.dart';
 
-class AddListingStep2Screen extends StatefulWidget {
+class AddListingStep2Screen extends ConsumerStatefulWidget {
   const AddListingStep2Screen({required this.draft, super.key});
 
   final AddListingDraft draft;
 
   @override
-  State<AddListingStep2Screen> createState() => _AddListingStep2ScreenState();
+  ConsumerState<AddListingStep2Screen> createState() =>
+      _AddListingStep2ScreenState();
 }
 
-class _AddListingStep2ScreenState extends State<AddListingStep2Screen> {
+class _AddListingStep2ScreenState extends ConsumerState<AddListingStep2Screen> {
   final _formKey = GlobalKey<FormState>();
 
   final _imagePicker = ImagePicker();
@@ -210,10 +216,7 @@ class _AddListingStep2ScreenState extends State<AddListingStep2Screen> {
                         textInputAction: TextInputAction.next,
                         decoration: const InputDecoration(
                           labelText: 'سعر سنوي',
-                          prefixIcon: const Icon(
-                            LucideIcons.calendar,
-                            size: 18,
-                          ),
+                          prefixIcon: Icon(LucideIcons.calendar, size: 18),
                         ),
                         validator: _optionalPositiveInt,
                       ),
@@ -263,10 +266,7 @@ class _AddListingStep2ScreenState extends State<AddListingStep2Screen> {
                       decoration: const InputDecoration(
                         labelText: 'اشرح علاقتك بالعقار (مالك/مفوض/وكالة...)',
                         alignLabelWithHint: true,
-                        prefixIcon: const Icon(
-                          LucideIcons.messageSquare,
-                          size: 18,
-                        ),
+                        prefixIcon: Icon(LucideIcons.messageSquare, size: 18),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -427,9 +427,79 @@ class _AddListingStep2ScreenState extends State<AddListingStep2Screen> {
       return;
     }
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('تم إرسال الإعلان (محاكاة)')));
+    final transactionType = widget.draft.listingType == 'بيع'
+        ? 'للبيع'
+        : 'للإيجار';
+
+    final price = widget.draft.listingType == 'بيع'
+        ? _salePriceController.text.trim()
+        : _firstNonEmpty(
+                _rentDailyController.text.trim(),
+                _rentMonthlyController.text.trim(),
+                _rentYearlyController.text.trim(),
+              ) ??
+              '0';
+
+    final createdAt = DateTime.now().toIso8601String().split('.').first;
+
+    final property = Property(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      ownerId: 'me',
+      propertyTypeId: _mapPropertyTypeId(widget.draft.propertyType),
+      title: widget.draft.title,
+      description: widget.draft.description,
+      area: widget.draft.area.toString(),
+      residents: (widget.draft.residents ?? 0).toString(),
+      bathrooms: widget.draft.bathrooms.toString(),
+      bedrooms: widget.draft.bedrooms.toString(),
+      isNegotiable: widget.draft.listingType == 'بيع' && _isNegotiable
+          ? '1'
+          : '0',
+      transactionType: transactionType,
+      price: price,
+      views: '0',
+      status: 'approved',
+      createdAt: createdAt,
+      ownerName: 'أنت',
+      typeName: widget.draft.propertyType,
+      streetName: widget.draft.location,
+      region: widget.draft.location,
+      images: const [],
+    );
+
+    ref.read(mockPropertiesProvider.notifier).addProperty(property);
+
+    Navigator.of(context).pop(true);
+    ref.read(selectedPageIndexProvider.notifier).setIndex(0);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => PropertyDetailsScreen(property)),
+    );
+  }
+
+  String? _firstNonEmpty(String a, String b, String c) {
+    if (a.isNotEmpty) return a;
+    if (b.isNotEmpty) return b;
+    if (c.isNotEmpty) return c;
+    return null;
+  }
+
+  String _mapPropertyTypeId(String typeName) {
+    switch (typeName) {
+      case 'شقة':
+        return 'apt';
+      case 'فيلا':
+        return 'villa';
+      case 'أرض':
+        return 'land';
+      case 'مزرعة':
+        return 'farm';
+      case 'محل تجاري':
+        return 'shop';
+      case 'غرفة':
+        return 'room';
+      default:
+        return 'unknown';
+    }
   }
 
   String? _requiredPositiveInt(String? value, String message) {
